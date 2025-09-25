@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-900 text-gray-100">
+<head>
+  <meta charset="UTF-8">
+  <title>doodles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(to bottom, #0f172a, #1e293b, #000); /* dark night vibe */
+    }
+    .label-font {
+      font-family: Consolas, monospace;
+    }
+  </style>
+</head>
+<body   class="p-6 flex flex-col items-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-200">
+
+<!--
+   ________________________________________
+  /                                        \
+ |   It's open source - just check out     |
+ |   the repo ;)                           |
+ |                                         |
+ |   https://github.com/Timmoth/doodles    |
+  \________________________________________/
+          \   ^__^
+           \  (oo)\_______
+              (__)\       )\/\
+                  ||----w |
+                  ||     ||
+-->
+                  
+  <h1 class="text-2xl font-semibold mb-4">doodles</h1>
+
+  <div id="gallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 overflow-y-auto max-h-screen"></div>
+
+  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+    <img id="overlay-img" class="max-w-full max-h-full rounded-lg shadow-lg" src="" alt="">
+    <button id="overlay-close" class="absolute top-4 right-4 text-white text-2xl">×</button>
+  </div>
+
+  <script>
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      const options = { month: 'short', year: '2-digit' }; // e.g. Sep 25
+      return date.toLocaleDateString(undefined, options);
+    }
+
+    async function loadGallery() {
+      const res = await fetch("doodles/gallery.json");
+      const data = await res.json();
+      const gallery = document.getElementById("gallery");
+
+      data.forEach(item => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "relative group";
+
+        const img = document.createElement("img");
+        img.src = "doodles/" + item.thumbnail;
+        img.alt = item.name;
+        img.className = "w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition";
+
+        img.addEventListener("click", () => {
+          document.getElementById("overlay-img").src = "doodles/" + item.fullsize;
+          document.getElementById("overlay").classList.remove("hidden");
+        });
+
+        // Caption: bottom-left (name)
+        const name = document.createElement("div");
+        name.textContent = `${item.name} / ${formatDate(item.timestamp)}`;
+        name.className = "absolute bottom-1 left-1 text-[8px] text-gray-200 bg-black/50 px-1 rounded label-font";
+
+        // Date: top-right
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(name);
+        gallery.appendChild(wrapper);
+      });
+    }
+
+    document.getElementById("overlay-close").addEventListener("click", () => {
+      document.getElementById("overlay").classList.add("hidden");
+    });
+
+    loadGallery();
+  </script>
+</body>
+</html>
