@@ -59,7 +59,7 @@ def process_image(file_path, out_path):
     # Save main doodle
     cropped.save(out_path, "JPEG", quality=95)
 
-    # --- Create thumbnail ---
+    # Create thumbnail
     thumb = ImageOps.fit(cropped, THUMB_SIZE, Image.LANCZOS)
     thumb_path = out_path.with_name(out_path.stem + "_thumbnail.jpg")
     thumb.save(thumb_path, "JPEG", quality=90)
@@ -68,12 +68,13 @@ def parse_date_from_filename(stem, mtime):
     parts = stem.split("_")
     if len(parts) >= 4:
         try:
-            year = int(parts[0]) + 2000  # e.g. "25" → 2025
+            year = int(parts[0]) + 2000
             month = int(parts[1])
             day = int(parts[2])
             return datetime(year, month, day)
         except Exception:
             pass
+
     # fallback: file modification date
     return datetime.fromtimestamp(mtime)
 
@@ -94,14 +95,12 @@ def main():
         thumb_path = img_path.with_name(img_path.stem + "_thumbnail.jpg")
         mtime = img_path.stat().st_mtime
 
-        # Extract name (drop date prefix, underscores → spaces)
         parts = img_path.stem.split("_")
         if len(parts) >= 4:
             display_name = " ".join(parts[3:])
         else:
             display_name = img_path.stem.replace("_", " ")
 
-        # Extract timestamp from filename or fallback
         dt = parse_date_from_filename(img_path.stem, mtime)
 
         metadata.append({
